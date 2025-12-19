@@ -17,6 +17,7 @@ class MarketBasketGraph:
         # Outer dict: node -> Inner dict: neighbor -> weight
         self.graph = defaultdict(lambda: defaultdict(int))
         self.nodes = set()
+        self.node_counts = defaultdict(int)
 
     def add_transaction(self, items):
         """
@@ -30,6 +31,7 @@ class MarketBasketGraph:
         # Add all items to the node set
         for item in unique_items:
             self.nodes.add(item)
+            self.node_counts[item] += 1
         
         # Generate all possible pairs (clique) and update edges
         for item1, item2 in itertools.combinations(unique_items, 2):
@@ -55,3 +57,7 @@ class MarketBasketGraph:
     def get_all_nodes(self):
         """Returns a list of all unique items in the graph."""
         return list(self.nodes)
+    
+    def get_node_frequency(self, node):
+        """Returns the total number of transactions the item appeared in"""
+        return self.node_counts.get(node,0)
