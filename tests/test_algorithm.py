@@ -76,5 +76,34 @@ class TestMarketBasketAnalyser(unittest.TestCase):
         avg_size = self.analyser.get_average_basket_size()
         self.assertAlmostEqual(avg_size, 1.857, places=3)
 
+
+    def test_bfs_recommendations(self):
+        """
+        Test BFS to find items 2 hops away.
+        Scenario:
+        - 'Gin' is connected to 'Tonic'
+        - 'Tonic' is connected to 'Lemons'
+        - 'Gin' is NOT connected directly to 'Lemons'
+        
+        BFS from 'Gin' should find 'Lemons' at depth 2.
+        """
+        # Setup specific graph for this test
+        g = MarketBasketGraph()
+        g.add_transaction(['gin', 'tonic'])
+        g.add_transaction(['tonic', 'lemons'])
+        
+        analyzer = MarketBasketAnalyser(g)
+        
+        # Get items within 2 hops of Gin
+        recommendations = analyzer.get_bfs_recommendations('gin', max_depth=2)
+        
+        # Recommendations should contain Lemons (depth 2) and Tonic (depth 1)
+        self.assertIn('lemons', recommendations)
+        self.assertIn('tonic', recommendations)
+        
+        # Ensure the start node is filtered out
+        self.assertNotIn('gin', recommendations)
+
+
 if __name__ == '__main__':
     unittest.main()
