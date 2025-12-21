@@ -113,7 +113,7 @@ class MarketBasketAnalyser:
         """
         if commodity_items is None:
             # Default list of items to filter out if they appear as targets
-            commodity_items = ['whole milk', 'other vegetables', 'rolls/buns', 'soda']
+            commodity_items = ['whole milk', 'other vegetables', 'rolls/buns', 'soda', 'yogurt', 'root vegetables']
 
         top_drivers = self.get_top_n_items(top_n)
         results = []
@@ -123,21 +123,19 @@ class MarketBasketAnalyser:
             
             selected_partner = None
             for partner, count in partners:
-                # LOGIC: If driver is NOT a commodity, don't recommend a commodity.
-                # If driver IS a commodity (e.g. Milk), we recommend the next best thing.
-                if driver not in commodity_items and partner in commodity_items:
-                    continue 
-                
+                if partner in commodity_items:
+                    continue
                 selected_partner = partner
                 break
-            
             if selected_partner:
                 conf = self.calculate_confidence(driver, selected_partner)
                 results.append((driver, selected_partner, conf))
             else:
                 results.append((driver, None, 0.0))
-        
+        results.sort(key=lambda x:x[2], reverse=True)
         return results
+
+
 
     def get_niche_bfs_recommendations(self, start_item, max_depth=2, filter_hubs=None):
         """
